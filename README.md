@@ -69,21 +69,17 @@ GET /api/articles/:id
    npm install
    ```
 
-2. Set up environment variables in `.env`:
+2. Set up environment variables in `.env` with example from `.env.example`.
 
-   ```
-   PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/hackernews
-   NODE_ENV=development
-   ```
+3. Set up docker (more info below).
 
-3. Start the development server:
+4. Start the development server:
 
    ```
    npm run dev
    ```
 
-4. Start the production server:
+5. Start the production server:
    ```
    npm start
    ```
@@ -106,7 +102,6 @@ For easier setup and consistent environments, you can run MongoDB in Docker:
 
 - express: Web framework
 - mongoose: MongoDB object modeling
-- axios: HTTP client for API requests
 - dotenv: Environment variable management
 - cors: Cross-Origin Resource Sharing
 - helmet: Security headers
