@@ -33,7 +33,7 @@ exports.getTopArticles = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
 
-    const { articles, pagination } = await articleService.getArticles(
+    const { articles } = await articleService.getArticles(
       {},
       { limit, sortBy: "-points" },
     );

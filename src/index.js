@@ -15,6 +15,10 @@ app.use(helmet());
 app.use(morgan("combined"));
 app.use(express.json());
 
+// Swagger
+const { specs, swaggerUi } = require("./swagger");
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
 const articleRoutes = require("./routes/articles");
 
 app.use("/api/articles", articleRoutes);
@@ -24,6 +28,7 @@ app.get("/", (req, res) => {
   res.json({
     message: "HackerNews Aggregator API",
     version: "1.0.0",
+    docs: "/api-docs",
   });
 });
 
@@ -31,10 +36,6 @@ mongoose
   .connect(
     process.env.MONGODB_URI ||
       "mongodb://admin:password@localhost:27017/hackernews?authSource=admin",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
   )
   .then(async () => {
     console.log("Connected to MongoDB");
@@ -56,10 +57,12 @@ mongoose
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error);
+    process.exit(1);
   });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });
 
 module.exports = app;
