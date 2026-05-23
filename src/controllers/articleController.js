@@ -1,26 +1,28 @@
-const Article = require('../models/Article');
+const articleService = require("../services/articleService");
 
 exports.getAllArticles = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
 
-    const articles = await Article.find()
-      .sort({ created_at: -1 })
-      .skip(skip)
-      .limit(limit);
+    if (page < 1) {
+      return res.status(400).json({ message: "Page must be greater than 0" });
+    }
 
-    const total = await Article.countDocuments();
+    if (limit < 1 || limit > 100) {
+      return res
+        .status(400)
+        .json({ message: "Limit must be between 1 and 100" });
+    }
+
+    const { articles, pagination } = await articleService.getArticles(
+      {},
+      { page, limit },
+    );
 
     res.json({
       articles,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
+      pagination,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -30,11 +32,12 @@ exports.getAllArticles = async (req, res) => {
 exports.getTopArticles = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
-    
-    const articles = await Article.find()
-      .sort({ points: -1 })
-      .limit(limit);
-      
+
+    const { articles, pagination } = await articleService.getArticles(
+      {},
+      { limit, sortBy: "-points" },
+    );
+
     res.json(articles);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -45,21 +48,15 @@ exports.searchArticles = async (req, res) => {
   try {
     const query = req.query.q;
     const limit = parseInt(req.query.limit) || 20;
-    
+
     if (!query) {
-      return res.status(400).json({ message: 'Query parameter "q" is required' });
+      return res
+        .status(400)
+        .json({ message: 'Query parameter "q" is required' });
     }
-    
-    const articles = await Article.find({
-      $or: [
-        { title: { $regex: query, $options: 'i' } },
-        { author: { $regex: query, $options: 'i' } },
-        { tags: { $in: [new RegExp(query, 'i')] } }
-      ]
-    })
-    .sort({ created_at: -1 })
-    .limit(limit);
-    
+
+    const articles = await articleService.searchArticles({ query, limit });
+
     res.json(articles);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -68,12 +65,12 @@ exports.searchArticles = async (req, res) => {
 
 exports.getArticleById = async (req, res) => {
   try {
-    const article = await Article.findById(req.params.id);
-    
+    const article = await articleService.getArticleById(req.params.id);
+
     if (!article) {
-      return res.status(404).json({ message: 'Article not found' });
+      return res.status(404).json({ message: "Article not found" });
     }
-    
+
     res.json(article);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -35,7 +35,7 @@ exports.fetchLatestArticles = async (limit = 30) => {
 
 exports.initialize = async () => {
   try {
-    await this.fetchLatestArticles(50);
+    await exports.fetchLatestArticles(50);
     console.log("Initial data fetch completed");
   } catch (error) {
     console.error("Error during initial data fetch:", error.message);
