@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const Article = require("../models/Article");
-const articleService = require("../services/articleService");
+import mongoose from "mongoose";
+import Article from "../models/Article";
+import articleService from "../services/articleService";
 
 describe("Article Service", () => {
   beforeAll(async () => {

@@ -1,19 +1,19 @@
-const Article = require("../models/Article");
+import Article from "../models/Article.js";
 
 /**
  * Save articles to the database
  * @param {Array} articles - Array of article objects to save
  * @returns {Promise<Array>} Array of saved articles
  */
-exports.saveArticles = async (articles) => {
+const saveArticles = async (articles) => {
   try {
     const savedArticles = [];
-    
+
     for (const articleData of articles) {
       if (!articleData || !articleData.title || !articleData.url) {
         continue;
       }
-      
+
       const article = await Article.findOneAndUpdate(
         { url: articleData.url },
         {
@@ -21,20 +21,20 @@ exports.saveArticles = async (articles) => {
           fetched_at: new Date(),
         },
         {
-          new: true, 
+          new: true,
           upsert: true,
           runValidators: true,
         },
       );
-      
+
       savedArticles.push(article);
     }
-    
+
     return savedArticles;
   } catch (error) {
     throw new Error(`Failed to save articles: ${error.message}`);
   }
-};
+}
 
 /**
  * Get articles from the database with filtering and pagination
@@ -45,18 +45,18 @@ exports.saveArticles = async (articles) => {
  * @param {string} options.sortBy - Sort field (default: '-created_at')
  * @returns {Promise<Object>} Object containing articles and pagination info
  */
-exports.getArticles = async (filter = {}, options = {}) => {
+const getArticles = async (filter = {}, options = {}) => {
   try {
     const { page = 1, limit = 20, sortBy = "-created_at" } = options;
     const skip = (page - 1) * limit;
-    
+
     const articles = await Article.find(filter)
       .sort(sortBy)
       .skip(skip)
       .limit(limit);
-      
+
     const total = await Article.countDocuments(filter);
-    
+
     return {
       articles,
       pagination: {
@@ -69,21 +69,21 @@ exports.getArticles = async (filter = {}, options = {}) => {
   } catch (error) {
     throw new Error(`Failed to get articles: ${error.message}`);
   }
-};
+}
 
 /**
  * Get an article by its ID
  * @param {string} id - Article ID
  * @returns {Promise<Object|null>} Article object or null if not found
  */
-exports.getArticleById = async (id) => {
+const getArticleById = async (id) => {
   try {
     const article = await Article.findById(id);
     return article;
   } catch (error) {
     throw new Error(`Failed to get article: ${error.message}`);
   }
-};
+}
 
 /**
  * Search articles by query
@@ -92,7 +92,7 @@ exports.getArticleById = async (id) => {
  * @param {number} params.limit - Number of articles to return (default: 20)
  * @returns {Promise<Array>} Array of matching articles
  */
-exports.searchArticles = async ({ query, limit = 20 }) => {
+const searchArticles = async ({ query, limit = 20 }) => {
   try {
     // Create a more efficient search using text index if available
     // Fallback to regex search for compatibility
@@ -110,24 +110,34 @@ exports.searchArticles = async ({ query, limit = 20 }) => {
   } catch (error) {
     throw new Error(`Failed to search articles: ${error.message}`);
   }
-};
+}
 
 /**
  * Cleanup old articles from the database
  * @param {number} days - Number of days to keep articles (default: 30)
  * @returns {Promise<number>} Number of deleted articles
  */
-exports.cleanupOldArticles = async (days = 30) => {
+const cleanupOldArticles = async (days = 30) => {
   try {
     const dateThreshold = new Date();
     dateThreshold.setDate(dateThreshold.getDate() - days);
-    
+
     const result = await Article.deleteMany({
       created_at: { $lt: dateThreshold },
     });
-    
+
     return result.deletedCount;
   } catch (error) {
     throw new Error(`Failed to cleanup old articles: ${error.message}`);
   }
+}
+
+const articleService = {
+  saveArticles,
+  getArticles,
+  getArticleById,
+  searchArticles,
+  cleanupOldArticles,
 };
+
+export default articleService;

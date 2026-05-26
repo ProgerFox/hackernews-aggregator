@@ -1,7 +1,8 @@
-const hackerNewsService = require("./hackerNewsService");
-const articleService = require("./articleService");
+// const articleService = require("./articleService");
+import articleService from "./articleService.js";
+import hackerNewsService from "./hackerNewsService.js";
 
-exports.fetchLatestArticles = async (limit = 30) => {
+const fetchLatestArticles = async (limit = 30) => {
   try {
     console.log("Fetching latest articles from HackerNews...");
 
@@ -33,11 +34,18 @@ exports.fetchLatestArticles = async (limit = 30) => {
   }
 };
 
-exports.initialize = async () => {
+const initialize = async () => {
   try {
-    await exports.fetchLatestArticles(50);
+    await fetchLatestArticles(50);
     console.log("Initial data fetch completed");
   } catch (error) {
     console.error("Error during initial data fetch:", error.message);
   }
 };
+
+const fetchService = {
+  fetchLatestArticles,
+  initialize,
+};
+
+export default fetchService;

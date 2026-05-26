@@ -1,6 +1,7 @@
-const express = require("express");
+import express from "express";
+import articleController from "../controllers/articleController.js";
+
 const router = express.Router();
-const articleController = require("../controllers/articleController");
 
 /**
  * @swagger
@@ -154,4 +155,4 @@ router.get("/search", articleController.searchArticles);
  */
 router.get("/:id", articleController.getArticleById);
 
-module.exports = router;
+export default router;

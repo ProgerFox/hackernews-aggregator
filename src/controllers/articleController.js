@@ -1,6 +1,6 @@
-const articleService = require("../services/articleService");
+import articleService from "../services/articleService.js";
 
-exports.getAllArticles = async (req, res) => {
+const getAllArticles = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
@@ -29,7 +29,7 @@ exports.getAllArticles = async (req, res) => {
   }
 };
 
-exports.getTopArticles = async (req, res) => {
+const getTopArticles = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
 
@@ -44,7 +44,7 @@ exports.getTopArticles = async (req, res) => {
   }
 };
 
-exports.searchArticles = async (req, res) => {
+const searchArticles = async (req, res) => {
   try {
     const query = req.query.q;
     const limit = parseInt(req.query.limit) || 20;
@@ -63,7 +63,7 @@ exports.searchArticles = async (req, res) => {
   }
 };
 
-exports.getArticleById = async (req, res) => {
+const getArticleById = async (req, res) => {
   try {
     const article = await articleService.getArticleById(req.params.id);
 
@@ -76,3 +76,12 @@ exports.getArticleById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const articleController = {
+  getAllArticles,
+  getTopArticles,
+  searchArticles,
+  getArticleById,
+};
+
+export default articleController;

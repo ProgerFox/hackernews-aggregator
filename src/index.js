@@ -1,9 +1,12 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import fetchService from "./services/fetchService.js";
+import articleRoutes from "./routes/articles.js";
+import { specs, swaggerUi } from "./swagger.js";
 
 dotenv.config();
 
@@ -15,11 +18,7 @@ app.use(helmet());
 app.use(morgan("combined"));
 app.use(express.json());
 
-// Swagger
-const { specs, swaggerUi } = require("./swagger");
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-
-const articleRoutes = require("./routes/articles");
 
 app.use("/api/articles", articleRoutes);
 
@@ -33,14 +32,9 @@ app.get("/", (req, res) => {
 });
 
 mongoose
-  .connect(
-    process.env.MONGODB_URI ||
-      "mongodb://admin:password@localhost:27017/hackernews?authSource=admin",
-  )
+  .connect(process.env.MONGODB_URI)
   .then(async () => {
     console.log("Connected to MongoDB");
-
-    const fetchService = require("./services/fetchService");
 
     await fetchService.initialize();
 
@@ -65,4 +59,4 @@ app.listen(PORT, () => {
   console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
 });
 
-module.exports = app;
+export default app;

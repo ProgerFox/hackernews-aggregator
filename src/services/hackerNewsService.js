@@ -1,6 +1,6 @@
 const HACKER_NEWS_API_BASE = "https://hacker-news.firebaseio.com/v0";
 
-exports.getTopStoryIds = async () => {
+const getTopStoryIds = async () => {
   const response = await fetch(`${HACKER_NEWS_API_BASE}/topstories.json`);
 
   if (!response.ok)
@@ -12,7 +12,7 @@ exports.getTopStoryIds = async () => {
   return data;
 };
 
-exports.getItemById = async (id) => {
+const getItemById = async (id) => {
   const response = await fetch(`${HACKER_NEWS_API_BASE}/item/${id}.json`);
 
   if (!response.ok)
@@ -24,7 +24,7 @@ exports.getItemById = async (id) => {
   return data;
 };
 
-exports.getUserById = async (id) => {
+const getUserById = async (id) => {
   const response = await fetch(`${HACKER_NEWS_API_BASE}/user/${id}.json`);
 
   if (!response.ok)
@@ -36,11 +36,11 @@ exports.getUserById = async (id) => {
   return data;
 };
 
-exports.getItemsByIds = async (ids, limit = 50) => {
+const getItemsByIds = async (ids, limit = 50) => {
   try {
     // Limit concurrent requests to avoid overwhelming the API
     const limitedIds = ids.slice(0, limit);
-    const promises = limitedIds.map((id) => exports.getItemById(id));
+    const promises = limitedIds.map((id) => getItemById(id));
     const items = await Promise.all(promises);
     return items.filter(
       (item) => item && item.type === "story" && !item.deleted && !item.dead,
@@ -49,3 +49,12 @@ exports.getItemsByIds = async (ids, limit = 50) => {
     throw new Error(`Failed to fetch items: ${error.message}`);
   }
 };
+
+const hackerNewsService = {
+  getTopStoryIds,
+  getItemById,
+  getUserById,
+  getItemsByIds,
+};
+
+export default hackerNewsService;
