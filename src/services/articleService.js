@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Article from "../models/Article.js";
 
 /**
@@ -34,7 +35,7 @@ const saveArticles = async (articles) => {
   } catch (error) {
     throw new Error(`Failed to save articles: ${error.message}`);
   }
-}
+};
 
 /**
  * Get articles from the database with filtering and pagination
@@ -69,7 +70,7 @@ const getArticles = async (filter = {}, options = {}) => {
   } catch (error) {
     throw new Error(`Failed to get articles: ${error.message}`);
   }
-}
+};
 
 /**
  * Get an article by its ID
@@ -83,7 +84,7 @@ const getArticleById = async (id) => {
   } catch (error) {
     throw new Error(`Failed to get article: ${error.message}`);
   }
-}
+};
 
 /**
  * Search articles by query
@@ -92,7 +93,7 @@ const getArticleById = async (id) => {
  * @param {number} params.limit - Number of articles to return (default: 20)
  * @returns {Promise<Array>} Array of matching articles
  */
-const searchArticles = async ({ query, limit = 20 }) => {
+const searchArticles = async (query, limit = 20) => {
   try {
     // Create a more efficient search using text index if available
     // Fallback to regex search for compatibility
@@ -110,7 +111,48 @@ const searchArticles = async ({ query, limit = 20 }) => {
   } catch (error) {
     throw new Error(`Failed to search articles: ${error.message}`);
   }
-}
+};
+
+/**
+ * Add new article
+ * @param {object} articleData - Article object data
+ * @returns {Promise<object>} Info about new article in db
+ */
+const addArticle = async (articleData) => {
+  if (!articleData?.title || !articleData?.url) {
+    throw new Error("Incorrect article format");
+  }
+
+  const result = await Article.updateOne(
+    { url: articleData.url },
+    { $set: { ...articleData, fetched_at: new Date() } },
+    { upsert: true, runValidators: true },
+  );
+
+  return {
+    upserted: result.upsertedCount > 0,
+    id: result.upsertedId ?? null,
+    modified: result.modifiedCount > 0,
+  };
+};
+
+/**
+ * Delete article by id
+ * @param {number} id - id of an article to be deleted
+ */
+const deleteArticleById = async (id) => {
+  if (!mongoose.isValidObjectId(id)) {
+    throw new Error("Invalid article ID");
+  }
+
+  try {
+    await Article.deleteOne({
+      _id: id,
+    });
+  } catch (error) {
+    throw new Error(`Failed to delete articles: ${error.message}`);
+  }
+};
 
 /**
  * Cleanup old articles from the database
@@ -130,13 +172,15 @@ const cleanupOldArticles = async (days = 30) => {
   } catch (error) {
     throw new Error(`Failed to cleanup old articles: ${error.message}`);
   }
-}
+};
 
 const articleService = {
   saveArticles,
   getArticles,
   getArticleById,
   searchArticles,
+  addArticle,
+  deleteArticleById,
   cleanupOldArticles,
 };
 

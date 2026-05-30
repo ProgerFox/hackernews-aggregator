@@ -55,7 +55,7 @@ const searchArticles = async (req, res) => {
         .json({ message: 'Query parameter "q" is required' });
     }
 
-    const articles = await articleService.searchArticles({ query, limit });
+    const articles = await articleService.searchArticles(query, limit);
 
     res.json(articles);
   } catch (error) {
@@ -77,11 +77,36 @@ const getArticleById = async (req, res) => {
   }
 };
 
+const postArticle = async (req, res) => {
+  try {
+    const { id } = await articleService.addArticle(req.body);
+
+    res.status(201).json({ message: id });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteArticleById = async (req, res) => {
+  try {
+    await articleService.deleteArticleById(req.params.id);
+
+    res.status(200).json({ message: "Success" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const articleController = {
   getAllArticles,
   getTopArticles,
   searchArticles,
   getArticleById,
+  postArticle,
+  deleteArticleById,
 };
 
 export default articleController;
