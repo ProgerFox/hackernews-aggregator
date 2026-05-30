@@ -51,6 +51,42 @@ GET /articles
 }
 ```
 
+### Add or update an Article
+
+```
+POST /articles
+```
+
+**Query Parameters:**
+
+- No parameters
+
+**Request body:**
+
+```json
+{
+  "title": "string",
+  "url": "string",
+  "author": "string",
+  "points": 0,
+  "comments_count": 0,
+  "tags": ["string"]
+}
+```
+
+**Response:**
+
+```json
+{
+  "title": "string",
+  "url": "string",
+  "author": "string",
+  "points": 0,
+  "comments_count": 0,
+  "tags": ["string"]
+}
+```
+
 ### Get Top Articles
 
 ```
@@ -130,33 +166,24 @@ GET /articles/:id
 }
 ```
 
-## Error Responses
+### Delete Article by ID
 
-All endpoints may return the following error responses:
+```
+DELETE /articles/:id
+```
 
-**400 Bad Request**
+**Response:**
 
 ```json
 {
-  "message": "Error description"
+  "title": "string",
+  "url": "string",
+  "author": "string",
+  "points": 0,
+  "comments_count": 0,
+  "tags": ["string"]
 }
-```
-
-**404 Not Found**
-
-```json
-{
-  "message": "Article not found"
-}
-```
-
-**500 Internal Server Error**
-
-```json
-{
-  "message": "Error description"
-}
-```
+``` 
 
 ## Usage Examples
 
